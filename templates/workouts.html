@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Your workouts</h2>
+{% if workouts %}
+<table class="table table-striped mt-3">
+    <thead>
+        <tr><th>Date</th><th>Workout</th><th>Duration (min)</th></tr>
+    </thead>
+    <tbody>
+        {% for w in workouts %}
+        <tr>
+            <td>{{ w.date.strftime('%Y-%m-%d %H:%M') }}</td>
+            <td>{{ w.workout }}</td>
+            <td>{{ w.duration }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No workouts recorded yet.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,97 @@
+﻿{% extends "base.html" %}
+{% block content %}
+<h2>Hello, {{ current_user.username }} 👋</h2>
+
+<div class="row">
+    <!-- Strength Form -->
+    <div class="col-md-6">
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5>Add Strength Workout</h5>
+                <form method="post">
+                    <input type="hidden" name="form_type" value="strength">
+                    <div class="mb-2"><input name="exercise" class="form-control" placeholder="Exercise (e.g., Bench Press)" required></div>
+                    <div class="mb-2"><input name="reps" class="form-control" placeholder="Reps" required></div>
+                    <div class="mb-2"><input name="weight" class="form-control" placeholder="Weight (kg)" required></div>
+                    <button class="btn btn-success">Add Strength</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h5>Recent Strength Workouts</h5>
+                {% if strength_workouts %}
+                <ul class="list-group">
+                    {% for w in strength_workouts %}
+                    <li class="list-group-item">
+                        {{ w.exercise }} — {{ w.reps }} reps × {{ w.weight }} kg ({{ w.date.strftime("%Y-%m-%d") }})
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p>No strength workouts yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Cardio Form -->
+    <div class="col-md-6">
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5>Add Cardio Workout</h5>
+                <form method="post">
+                    <input type="hidden" name="form_type" value="cardio">
+                    <div class="mb-2"><input name="activity" class="form-control" placeholder="Activity (e.g., Running)" required></div>
+                    <div class="mb-2"><input name="duration" class="form-control" placeholder="Duration (minutes)" required></div>
+                    <div class="mb-2"><input name="distance" class="form-control" placeholder="Distance (km)" required></div>
+                    <div class="mb-2"><input name="calories" class="form-control" placeholder="Calories (optional)"></div>
+                    <button class="btn btn-primary">Add Cardio</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h5>Recent Cardio Workouts</h5>
+                {% if cardio_workouts %}
+                <ul class="list-group">
+                    {% for w in cardio_workouts %}
+                    <li class="list-group-item">
+                        {{ w.activity }} — {{ w.duration }} min, {{ w.distance }} km {% if w.calories %} ({{ w.calories }} kcal){% endif %} ({{ w.date.strftime("%Y-%m-%d") }})
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p>No cardio workouts yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Graph -->
+<div class="card mt-4">
+    <div class="card-body">
+        <h5>Strength Progress</h5>
+        <canvas id="strengthChart"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const ctx = document.getElementById('strengthChart').getContext('2d');
+const data = {
+  labels: {{ strength_graph_data|map(attribute='date')|list|tojson }},
+  datasets: [{
+    label: 'Weight (kg)',
+    data: {{ strength_graph_data|map(attribute='weight')|list|tojson }},
+    borderColor: 'rgba(75, 192, 192, 1)',
+    fill: false,
+    tension: 0.1
+  }]
+};
+new Chart(ctx, { type: 'line', data: data });
+</script>
+{% endblock %}

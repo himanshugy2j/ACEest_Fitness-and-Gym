@@ -1,0 +1,14 @@
+body {
+    background: url("/static/gym-bg.jpg") no-repeat center center fixed;
+    background-size: cover;
+    color: white; /* text on dark background */
+    min-height: 100vh;
+}
+
+.navbar, .card {
+    background-color: rgba(0, 0, 0, 0.7) !important; /* dark translucent panels */
+}
+
+h1, h2, h5, p, label {
+    color: #f8f9fa; /* light text */
+}
