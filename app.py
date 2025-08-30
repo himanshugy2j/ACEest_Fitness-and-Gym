@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user, UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime
+from datetime import datetime, timezone
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'change-this-secret-to-something-random'
@@ -18,7 +18,7 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -31,7 +31,7 @@ class Workout(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     workout = db.Column(db.String(200), nullable=False)
     duration = db.Column(db.Integer, nullable=False)  # minutes
-    date = db.Column(db.DateTime, default=datetime.utcnow)
+    date = db.Column(db.DateTime, default=datetime.now(timezone.utc))
 
     user = db.relationship('User', backref=db.backref('workouts', lazy=True))
 
@@ -43,7 +43,7 @@ class StrengthWorkout(db.Model):
     exercise = db.Column(db.String(200), nullable=False)
     reps = db.Column(db.Integer, nullable=False)
     weight = db.Column(db.Float, nullable=False)  # kg
-    date = db.Column(db.DateTime, default=datetime.utcnow)
+    date = db.Column(db.DateTime, default=datetime.now(timezone.utc))
 
     user = db.relationship('User', backref=db.backref('strength_workouts', lazy=True))
 
@@ -55,13 +55,13 @@ class CardioWorkout(db.Model):
     duration = db.Column(db.Integer)   # minutes
     distance = db.Column(db.Float)     # km
     calories = db.Column(db.Float)
-    date = db.Column(db.DateTime, default=datetime.utcnow)
+    date = db.Column(db.DateTime, default=datetime.now(timezone.utc))
 
     user = db.relationship('User', backref=db.backref('cardio_workouts', lazy=True))
 # User loader for Flask-Login
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return db.session.get(User, user_id)
 
 # Routes
 @app.route('/')
