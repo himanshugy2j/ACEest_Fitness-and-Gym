@@ -15,4 +15,4 @@ COPY . .
 EXPOSE 5000
 
 # Default command: run Flask app
-CMD ["python", "app.py"]
+CMD ["flask", "--app", "app", "run", "--host=0.0.0.0"]
